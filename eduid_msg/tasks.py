@@ -311,12 +311,12 @@ class MessageRelay(Task):
         """
         return self.navet.get_all_data(identity_number)
 
-    def set_audit_log_postal_address(self, audit_reference):
+    def set_audit_log_postal_address(self, audit_reference, nin):
         conn = MongoDB(self.MONGODB_URI)
         db = conn.get_database(TRANSACTION_AUDIT_DB)
         log_entry = db[TRANSACTION_AUDIT_COLLECTION].find_one({'data.audit_reference': audit_reference})
-        if log_entry and log_entry.get('data', {}).get('recipient', None):
-            result = get_postal_address(log_entry['data']['recipient'])
+        if log_entry and log_entry.get('data', None):
+            result = get_postal_address(nin)
             if result:
                 address_dict = dict(result)
                 log_entry['data']['navet_response'] = address_dict
@@ -449,10 +449,10 @@ def get_relations_to(identity_number, relative_nin):
 
 
 @task(base=MessageRelay, rate_limit=MESSAGE_RATE_LIMIT, max_retries=10)
-def set_audit_log_postal_address(audit_reference):
+def set_audit_log_postal_address(audit_reference, nin):
     """
-    Looks in the transaction audit collection for the audit reference and make a postal address lookup and adds the
-    result to the transaction audit document.
+    Looks in the transaction audit collection for the audit reference and make a postal address lookup on the nin
+    and adds the result to the transaction audit document.
     """
     # Decorator task base=MessageRelay makes this an instance of MessageRelay().
     # This funny looking assignment of self to this function supposedly lets us
@@ -460,7 +460,7 @@ def set_audit_log_postal_address(audit_reference):
     # http://docs.celeryproject.org/en/latest/userguide/tasks.html#instantiation
     self = set_audit_log_postal_address
     try:
-        return self.set_audit_log_postal_address(audit_reference)
+        return self.set_audit_log_postal_address(audit_reference, nin)
     except Exception, e:
         # Increase countdown every time it fails (to a maximum of 1 day)
         countdown = 600 * send_message.request.retries ** 2
