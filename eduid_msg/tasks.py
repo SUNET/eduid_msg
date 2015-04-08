@@ -10,7 +10,7 @@ from eduid_msg.cache import CacheMDB
 from eduid_msg.utils import load_template
 from eduid_msg.decorators import TransactionAudit
 from eduid_msg.config import read_configuration
-from eduid_am.db import MongoDB
+from eduid_userdb.db import MongoDB
 from time import time
 from datetime import datetime, timedelta
 from pynavet.postaladdress import PostalAddress
