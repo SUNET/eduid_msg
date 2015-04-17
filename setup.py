@@ -13,13 +13,14 @@ if os.path.exists(README_fn):
 version = '0.8.7-dev'
 
 install_requires = [
-    'eduid_am >= 0.4.9',
-    'eduid_userdb >= 0.0.0',
+    'eduid_am >= 0.6.0-dev, < 0.7.0',
+    'eduid_userdb >= 0.0.0, < 0.1.0',
+    'pynavet >= 0.6.0, < 0.7.0',
+
     'python-dateutil >= 2.1',
-    'pymongo >= 2.6.3',
+    'pymongo >= 2.8.0, < 3.0.0',
     'celery >= 3.1.9',
     'pysmscom >= 0.4',
-    'pynavet >= 0.6.0',
     'Jinja2 >= 2.7.3',
     'hammock >= 0.2.4',
 ]
